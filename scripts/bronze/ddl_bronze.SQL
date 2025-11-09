@@ -1,128 +1,62 @@
-exec bronze.load_bronze;
+if OBJECT_ID('bronze.crm_cust_info','U') is not null
+	drop table bronze.crm_cust_info;
+create table bronze.crm_cust_info(
+cst_id int,
+cst_key nvarchar(50),
+cst_firstname nvarchar(50),
+cst_lastname nvarchar(50),
+cst_material_status nvarchar(50),
+cst_gndr nvarchar(50),
+cst_create_date date
+);
 
+if OBJECT_ID('bronze.crm_prd_info','U') is not null
+	drop table bronze.crm_prd_info;
+create table bronze.crm_prd_info(
+prd_id	int,
+prd_key	nvarchar(50),
+prd_nm	nvarchar(50),
+prd_cost	int,
+prd_line	nvarchar(50),
+prd_start_dt	datetime,
+prd_end_dt datetime
+);
 
-Create or alter Procedure bronze.load_bronze as 
-begin
-	declare @start_time datetime, @end_time datetime, @batch_start_time datetime,@batch_end_time datetime
-	begin try
+if OBJECT_ID('bronze.crm_sales_details','U') is not null
+	drop table bronze.crm_sales_details;
+create table bronze.crm_sales_details(
 
-	set @batch_start_time=GETDATE();
-		print '================================================================================';
-		print 'Loading bronz layer';
-		print '================================================================================';
+sls_ord_num	nvarchar(50),
+sls_prd_key	nvarchar(50),
+sls_cust_id	int,
+sls_order_dt int,	
+sls_ship_dt	int,
+sls_due_dt	int,
+sls_sales	int,
+sls_quantity int,
+sls_price int
+);
 
+if OBJECT_ID('bronze.erp_az12','U') is not null
+	drop table bronze.erp_az12;
+create table bronze.erp_az12(
+CID	nvarchar(50),
+BDATE date ,
+GEN nvarchar(50)
+);
 
-		print '--------------------------------------------------------------------------------';
-		print 'Loading CRM table'
-		print '--------------------------------------------------------------------------------';
+if OBJECT_ID('bronze.erp_loc_a101','U') is not null
+	drop table bronze.erp_loc_a101;
+create table bronze.erp_loc_a101(
+CID	nvarchar(50),
+CNTRY nvarchar(50)
+);
 
-
-		set @start_time=getdate();
-		print '>>> Truncating table: bronze.crm_cust_info';
-		truncate table bronze.crm_cust_info;
-		print '>>> adding table: bronze.crm_cust_info';
-		bulk insert bronze.crm_cust_info
-		from 'C:\Users\lilha\Downloads\sql-data-warehouse-project\sql-data-warehouse-project\datasets\source_crm\cust_info.csv'
-		with (
-		firstrow=2,
-		FIELDTERMINATOR=',',
-		tablock
-		);
-		set @end_time=getdate();
-		print '>>>Load Duration :'+cast(datediff(second,@start_time,@end_time) as nvarchar)+'  seconds';
-		print '----------';
-
-		set @start_time=getdate();
-		print '>>> Truncating table: bronze.crm_prd_info';
-		truncate table bronze.crm_prd_info;
-		print '>>> adding table: bronze.crm_prd_info';
-		bulk insert bronze.crm_prd_info
-		from 'C:\Users\lilha\Downloads\sql-data-warehouse-project\sql-data-warehouse-project\datasets\source_crm\prd_info.csv'
-		with (
-		firstrow=2,
-		FIELDTERMINATOR=',',
-		tablock
-		);
-		set @end_time=getdate();
-		print '>>>Load Duration :'+cast(datediff(second,@start_time,@end_time) as nvarchar)+'  seconds';
-		print '----------';
-
-
-
-		set @start_time=getdate();
-		print '>>> Truncating table: bronze.crm_sales_details';
-		truncate table bronze.crm_sales_details;
-		print '>>> adding table: bronze.crm_sales_details';
-		bulk insert bronze.crm_sales_details
-		from 'C:\Users\lilha\Downloads\sql-data-warehouse-project\sql-data-warehouse-project\datasets\source_crm\sales_details.csv'
-		with (
-		firstrow=2,
-		FIELDTERMINATOR=',',
-		tablock
-		);
-        set @end_time=getdate();
-		print '>>>Load Duration :'+cast(datediff(second,@start_time,@end_time) as nvarchar)+'  seconds';
-		print '----------';
-
-		print '--------------------------------------------------------------------------------';
-		print 'Loading ERP table'
-		print '--------------------------------------------------------------------------------';
-
-		set @start_time=getdate();
-		print '>>> Truncating table: bronze.erp_cust_az12';
-		truncate table bronze.erp_cust_az12;
-		print '>>> adding table: bronze.erp_cust_az12';
-		bulk insert bronze.erp_cust_az12
-		from 'C:\Users\lilha\Downloads\sql-data-warehouse-project\sql-data-warehouse-project\datasets\source_erp\cust_az12.csv'
-		with (
-		firstrow=2,
-		FIELDTERMINATOR=',',
-		tablock
-		);
-		set @end_time=getdate();
-		print '>>>Load Duration :'+cast(datediff(second,@start_time,@end_time) as nvarchar)+'  seconds';
-		print '----------';
-
-		set @start_time=getdate();
-		print '>>> Truncating table: bronze.erp_loc_a101';
-		truncate table bronze.erp_loc_a101;
-		print '>>> adding table: bronze.erp_loc_a101';
-		bulk insert bronze.erp_loc_a101
-		from 'C:\Users\lilha\Downloads\sql-data-warehouse-project\sql-data-warehouse-project\datasets\source_erp\loc_a101.csv'
-		with (
-		firstrow=2,
-		FIELDTERMINATOR=',',
-		tablock
-		);
-		set @end_time=getdate();
-		print '>>>Load Duration :'+cast(datediff(second,@start_time,@end_time) as nvarchar)+'  seconds';
-		print '----------';
-		set @start_time=getdate();
-		print '>>> Truncating table: bronze.erp_px_cat_g1v2';
-		truncate table bronze.erp_px_cat_g1v2;
-		print '>>> adding table: bronze.erp_px_cat_g1v2';
-		bulk insert bronze.erp_px_cat_g1v2
-		from 'C:\Users\lilha\Downloads\sql-data-warehouse-project\sql-data-warehouse-project\datasets\source_erp\px_cat_g1v2.csv'
-		with (
-		firstrow=2,
-		FIELDTERMINATOR=',',
-		tablock
-		);
-		set @end_time=getdate();
-		print '>>>Load Duration :'+cast(datediff(second,@start_time,@end_time) as nvarchar)+'  seconds';
-		print '----------';
-
-		set @batch_end_time=GETDATE();
-		print '>>> Total Load Duration :'+cast(datediff(second,@batch_start_time,@batch_end_time) as nvarchar)+'  seconds';
-		print '***********************************************';
-
-	end try
-	begin catch
-		print '========================================================'
-		print 'Error occured during loading bronz layer'
-		print 'Error Message'+error_message();
-		print 'Error meggage'+cast(error_number() as nvarchar);
-		print 'Error meggage'+cast(error_state() as nvarchar);
-		print '========================================================'
-	end catch
-end
+if OBJECT_ID('bronze.erp_px_cat_g1v2','U') is not null
+	drop table bronze.erp_px_cat_g1v2;
+create table bronze.erp_px_cat_g1v2(
+ID nvarchar(50),
+CAT nvarchar(50),
+SUBCAT nvarchar(50),
+MAINTENANCE nvarchar(50)
+);
